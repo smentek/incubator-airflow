@@ -47,22 +47,25 @@ class TestRedisSensor(unittest.TestCase):
             key='test_key'
         )
 
-    @patch("airflow.contrib.hooks.redis_hook.RedisHook.key_exists")
-    def test_poke(self, key_exists):
-        key_exists.return_value = True
-        self.assertTrue(self.sensor.poke(None))
+    @patch("airflow.contrib.sensors.redis_key_sensor.RedisHook")
+    def test_poke(self, RedisHook):
+        RedisHook.return_value.get_conn.return_value.exists.side_effect = [True, False]
+        self.assertTrue(self.sensor.poke(None), "Key exists on first call.")
+        RedisHook.assert_called_once_with('redis_default')
+        RedisHook.return_value.get_conn.assert_called_once_with()
+        RedisHook.return_value.get_conn.return_value.exists.assert_called_once_with('test_key')
+        self.assertFalse(self.sensor.poke(None), "Key does NOT exists on second call.")
 
-        key_exists.return_value = False
-        self.assertFalse(self.sensor.poke(None))
-
-    @patch("airflow.contrib.hooks.redis_hook.StrictRedis.exists")
-    def test_existing_key_called(self, redis_client_exists):
+    @patch("airflow.contrib.hooks.redis_hook.StrictRedis")
+    @patch('airflow.contrib.hooks.redis_hook.RedisHook.get_connection')
+    def test_existing_key_called(self, redis_hook_get_connection, StrictRedisMock):
         self.sensor.run(
             start_date=DEFAULT_DATE,
-            end_date=DEFAULT_DATE, ignore_ti_state=True
+            end_date=DEFAULT_DATE,
+            ignore_ti_state=True
         )
 
-        self.assertTrue(redis_client_exists.called_with('test_key'))
+        StrictRedisMock.return_value.exists.assert_called_once_with('test_key')
 
 
 if __name__ == '__main__':

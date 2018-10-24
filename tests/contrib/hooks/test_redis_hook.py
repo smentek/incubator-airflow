@@ -19,32 +19,69 @@
 
 
 import unittest
-from mock import patch
-
+from mock import patch, MagicMock
 from airflow import configuration
 from airflow.contrib.hooks.redis_hook import RedisHook
 
 
 class TestRedisHook(unittest.TestCase):
+
     def setUp(self):
         configuration.load_test_config()
 
-    def test_get_conn(self):
+    @patch('airflow.contrib.hooks.redis_hook.StrictRedis')
+    @patch('airflow.contrib.hooks.redis_hook.RedisHook.get_connection')
+    def test_get_conn(self, redis_hook_get_connection_mock, StrictRedisMock):
+        HOST = 'localhost'
+        PORT = 6379
+        PASSWORD = 's3cret!'
+        DB = 0
+
+        extra_dejson_mock = MagicMock()
+        extra_dejson_mock.get.return_value = DB
+        connection_parameters = MagicMock()
+        connection_parameters.configure_mock(
+            host=HOST,
+            port=PORT,
+            password=PASSWORD,
+            extra_dejson=extra_dejson_mock)
+        redis_hook_get_connection_mock.return_value = connection_parameters
+
         hook = RedisHook(redis_conn_id='redis_default')
-        self.assertEqual(hook.client, None)
-        self.assertEqual(
-            repr(hook.get_conn()),
-            (
-                'StrictRedis<ConnectionPool'
-                '<Connection<host=localhost,port=6379,db=0>>>'
-            )
+        self.assertEqual(hook.redis, None)
+
+        self.assertEqual(hook.host, None, "host initialised as None.")
+        self.assertEqual(hook.port, None, "port initialised as None.")
+        self.assertEqual(hook.password, None, "password initialised as None.")
+        self.assertEqual(hook.db, None, "db initialised as None.")
+
+        self.assertIs(hook.get_conn(), hook.get_conn(), "Connection initialized only if None.")
+
+        StrictRedisMock.assert_called_once_with(
+            host=HOST,
+            port=PORT,
+            password=PASSWORD,
+            db=DB,
         )
 
-    @patch("airflow.contrib.hooks.redis_hook.RedisHook.get_conn")
-    def test_first_conn_instantiation(self, get_conn):
+    @patch('airflow.contrib.hooks.redis_hook.StrictRedis')
+    @patch('airflow.contrib.hooks.redis_hook.RedisHook.get_connection')
+    def test_get_conn_password_stays_none(self, redis_hook_get_connection_mock, StrictRedisMock):
+        HOST = 'localhost'
+        PORT = 6379
+        PASSWORD = 'None'
+        DB = 0
+
+        extra_dejson_mock = MagicMock()
+        extra_dejson_mock.get.return_value = DB
+        connection_parameters = MagicMock()
+        connection_parameters.configure_mock(host=HOST, port=PORT, password=PASSWORD,
+                                             extra_dejson=extra_dejson_mock)
+        redis_hook_get_connection_mock.return_value = connection_parameters
+
         hook = RedisHook(redis_conn_id='redis_default')
-        hook.key_exists('test_key')
-        self.assertTrue(get_conn.called_once())
+        hook.get_conn()
+        self.assertEqual(hook.password, None)
 
 
 if __name__ == '__main__':
