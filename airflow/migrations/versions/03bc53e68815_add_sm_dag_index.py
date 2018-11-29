@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -17,11 +15,26 @@
 # specific language governing permissions and limitations
 # under the License.
 
+"""merge_heads_2
 
-def _integrate_plugins():
-    """Integrate plugins to the context"""
-    import sys
-    from airflow.plugins_manager import operators_modules
-    for operators_module in operators_modules:
-        sys.modules[operators_module.__name__] = operators_module
-        globals()[operators_module._name] = operators_module
+Revision ID: 03bc53e68815
+Revises: 0a2a5b66e19d, bf00311e1990
+Create Date: 2018-11-24 20:21:46.605414
+
+"""
+
+from alembic import op
+
+# revision identifiers, used by Alembic.
+revision = '03bc53e68815'
+down_revision = ('0a2a5b66e19d', 'bf00311e1990')
+branch_labels = None
+depends_on = None
+
+
+def upgrade():
+    op.create_index('sm_dag', 'sla_miss', ['dag_id'], unique=False)
+
+
+def downgrade():
+    op.drop_index('sm_dag', table_name='sla_miss')

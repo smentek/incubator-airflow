@@ -130,6 +130,8 @@ Operators
 .. Alphabetize this list
 
 .. autoclass:: airflow.contrib.operators.adls_list_operator.AzureDataLakeStorageListOperator
+.. autoclass:: airflow.contrib.operators.adls_to_gcs.AdlsToGoogleCloudStorageOperator
+.. autoclass:: airflow.contrib.operators.aws_athena_operator.AWSAthenaOperator
 .. autoclass:: airflow.contrib.operators.awsbatch_operator.AWSBatchOperator
 .. autoclass:: airflow.contrib.operators.bigquery_check_operator.BigQueryCheckOperator
 .. autoclass:: airflow.contrib.operators.bigquery_check_operator.BigQueryValueCheckOperator
@@ -206,6 +208,7 @@ Operators
 .. autoclass:: airflow.contrib.operators.s3_delete_objects_operator.S3DeleteObjectsOperator
 .. autoclass:: airflow.contrib.operators.s3_list_operator.S3ListOperator
 .. autoclass:: airflow.contrib.operators.s3_to_gcs_operator.S3ToGoogleCloudStorageOperator
+.. autoclass:: airflow.contrib.operators.s3_to_gcs_transfer_operator.S3ToGoogleCloudStorageTransferOperator
 .. autoclass:: airflow.contrib.operators.sagemaker_base_operator.SageMakerBaseOperator
 .. autoclass:: airflow.contrib.operators.sagemaker_endpoint_operator.SageMakerEndpointOperator
 .. autoclass:: airflow.contrib.operators.sagemaker_endpoint_config_operator.SageMakerEndpointConfigOperator
@@ -407,6 +410,7 @@ interface when possible and acting as building blocks for operators.
 Community contributed hooks
 '''''''''''''''''''''''''''
 .. Alphabetize this list
+.. autoclass:: airflow.contrib.hooks.aws_athena_hook.AWSAthenaHook
 .. autoclass:: airflow.contrib.hooks.aws_dynamodb_hook.AwsDynamoDBHook
 .. autoclass:: airflow.contrib.hooks.aws_firehose_hook.AwsFirehoseHook
 .. autoclass:: airflow.contrib.hooks.aws_hook.AwsHook
@@ -432,6 +436,7 @@ Community contributed hooks
 .. autoclass:: airflow.contrib.hooks.gcp_mlengine_hook.MLEngineHook
 .. autoclass:: airflow.contrib.hooks.gcp_pubsub_hook.PubSubHook
 .. autoclass:: airflow.contrib.hooks.gcs_hook.GoogleCloudStorageHook
+.. autoclass:: airflow.contrib.hooks.gcp_transfer_hook.GCPTransferServiceHook
 .. autoclass:: airflow.contrib.hooks.imap_hook.ImapHook
 .. autoclass:: airflow.contrib.hooks.jenkins_hook.JenkinsHook
 .. autoclass:: airflow.contrib.hooks.jira_hook.JiraHook
